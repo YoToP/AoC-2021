@@ -1,32 +1,32 @@
-def rowBingo(board):
-    for i in range(5):
+def rowBingo(board,width):
+    for i in range(width):
         rowBingo = 0
-        for j in range(5):
+        for j in range(width):
             if board[i][j][1] == True:
                 rowBingo += 1
-                if rowBingo == 5:
+                if rowBingo == width:
                     return True
     return False
 
-def columnBingo(board):
-    for i in range(5):
+def columnBingo(board,width):
+    for i in range(width):
         columnBingo = 0
-        for j in range(5):
+        for j in range(width):
             if board[j][i][1] == True:
                 columnBingo += 1
-                if columnBingo == 5:
+                if columnBingo == width:
                     return True
     return False
 
-def sumUnmarked(board):
+def sumUnmarked(board,width):
     sum = 0
-    for i in range(5):
-        for j in range(5):
+    for i in range(width):
+        for j in range(width):
             if board[j][i][1] == False:
                 sum += board[j][i][0]
     return sum
 
-def solvep1(path):
+def solvep1(path,width):
     with open(path) as f:
         lines = f.readlines()
     #Create boards 5x5
@@ -38,8 +38,10 @@ def solvep1(path):
         if not bFirstLine:
             if len(line) < 10: #Reset administration on empty line
                 _rowCount = 0
-                _lstBoard = [[],[],[],[],[]]
-            if len(line) >= 10:#skip empty rows
+                _lstBoard = []
+                for i in range(width):
+                    _lstBoard.append([])
+            if len(line) >= 10:#skip empty rows TODO ugly hack!!
                 _lineElements = line.split(" ")#causes problem with single digits
                 _filtertLineElements = [] # so we need an array with filtered elements. 
                 for lineElement in _lineElements:
@@ -47,7 +49,7 @@ def solvep1(path):
                         _filtertLineElements.append((int(lineElement),False)) #and add the tuple with a False bit, used for the score
                 _lstBoard[_rowCount] = _filtertLineElements.copy()
                 _rowCount += 1
-                if _rowCount == 5:
+                if _rowCount == width:
                     lstBoards.append(_lstBoard.copy())
         if bFirstLine:#read chosen numbers on first line
             lstChosenNumbers = line.split(",")
@@ -56,14 +58,14 @@ def solvep1(path):
     for _number in lstChosenNumbers:
         for i in range(len(lstBoards)):
             #mark chosen nr
-            for x in range(5):
-                for y in range(5):
+            for x in range(width):
+                for y in range(width):
                     _scratch = lstBoards[i][x][y][0]
                     if lstBoards[i][x][y][0] == int(_number):
                         lstBoards[i][x][y] = (int(_number),True)
             
-            if rowBingo(lstBoards[i]) or columnBingo(lstBoards[i]):
-                return sumUnmarked(lstBoards[i])*int(_number)
+            if rowBingo(lstBoards[i],width) or columnBingo(lstBoards[i],width):
+                return sumUnmarked(lstBoards[i],width)*int(_number)
     return 0
 
 if __name__ == '__main__': # Run when this script is not imported by another script(e.g. Unittest)
