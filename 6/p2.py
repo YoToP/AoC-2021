@@ -11,12 +11,9 @@ def solvep2(path,maxdays):
     #256 rounds:
     for i in range(256):
         _worklist = lstFishDatabase.copy()
-        for j in range(maxdays+1):
-            if j < maxdays:
-                lstFishDatabase[j] = _worklist[j+1]
-            if j == maxdays:
-                lstFishDatabase[maxdays] = _worklist[0]
-                lstFishDatabase[6] += _worklist[0]
+        lstFishDatabase[0:8] = _worklist[1:9]
+        lstFishDatabase[maxdays] = _worklist[0]
+        lstFishDatabase[6] += _worklist[0]
     iPopulation = 0
     for amount in lstFishDatabase:
         iPopulation += amount
