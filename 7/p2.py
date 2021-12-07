@@ -1,35 +1,32 @@
 from time import time
 from collections import defaultdict
-def calcTotal(steps):
-    if steps == 0:
-        return 0
-    total = 1
-    for i in range(2,steps+1):
-        total += i
-    return total
-
 
 def solvep2(path):
     with open(path) as f:
         lines = f.readlines()
     grid = defaultdict(int)
     maxValue = 0
+    total = 0 #to calc avg
+    count = 0
     for nr in lines[0].split(','):
         grid[int(nr)] += 1
+        total += int(nr)
+        count += 1
         if int(nr) > maxValue:
             maxValue = int(nr)
-    sortedDict=dict(sorted(grid.items(),key= lambda x:x[1],reverse=True))
+    avg = round(total / count)
 
     TotalFuel = 0
-    lowestTotalFuel = 10000000000
-    for i in range(maxValue):
+    lowestTotalFuel = -1
+    for i in range(avg-1,avg+1): #to be sure
         for key,value in grid.items():
-            TotalFuel += (calcTotal(abs(key - i))) * value
-        if TotalFuel < lowestTotalFuel:
-            lowestTotalFuel = TotalFuel
+            _X = abs(key - i)
+            _CrabFuel = _X * (_X+1) *0.5 #Crablogic
+            TotalFuel += _CrabFuel * value
+        if TotalFuel < lowestTotalFuel or lowestTotalFuel == -1:
+            lowestTotalFuel = TotalFuel      
         TotalFuel = 0
-
-    return lowestTotalFuel
+    return int(lowestTotalFuel)
 
 if __name__ == '__main__': # Run when this script is not imported by another script(e.g. Unittest)
     start_time = int(round(time() * 1000))
