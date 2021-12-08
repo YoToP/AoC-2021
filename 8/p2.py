@@ -6,36 +6,43 @@ def solvep2(path):
     lstSegmentLIST = []
     lstOutputLIST = []
     for line in lines:
-        lstSegmentLIST.append(line.split(" | ")[0])
-        lstOutputLIST.append(line.split(" | ")[1])
+        words = line.split(" ")
+        _output = False
+        lstLineSegmentList = []
+        lstLineOutputList = []
+        for i in range(len(words)):
+            if words[i] == "|":
+                _output = True
+            elif _output:
+                lstLineOutputList.append("".join(sorted(words[i])).replace('\n',""))
+            else:
+                lstLineSegmentList.append("".join(sorted(words[i])))
+            lstSegmentLIST.append(lstLineSegmentList)
+            lstOutputLIST.append(lstLineOutputList)
 
     easyWordCount = 0
     for i in range(len(lstOutputLIST)):
         line = lstOutputLIST[i]
         woordenboek = defaultdict(int)
+        lstMissingNrs = []
         #1 Determine missing nr
 
-        for word in line.split(" "):
-            word = word.replace('\n',"")
+        for word in line:
             if len(word) == 5:
-                None
-                #lstMissingNrs.append(word)
+                if not lstMissingNrs.__contains__(word):
+                    lstMissingNrs.append(word)
             if len(word) == 6:
-                None
-                #lstMissingNrs.append(word)
+                if not lstMissingNrs.__contains__(word):
+                    lstMissingNrs.append(word)
         #1.5Add known
-        for word in lstSegmentLIST[i].split(" "):
-            word = word.replace('\n',"")
-            if len(word) == 2:
-                woordenboek[1] = word
-            if len(word) == 3:
-                woordenboek[7] = word
-            if len(word) == 4:
-                woordenboek[4] = word
-            if len(word) == 7:
-                woordenboek[8] = word
+        for word in lstSegmentLIST[i]:
+            #word = word.replace('\n',"")
+            if len(word) == 2:woordenboek[1] = word
+            if len(word) == 3:woordenboek[7] = word
+            if len(word) == 4:woordenboek[4] = word
+            if len(word) == 7:woordenboek[8] = word
         #2 Decipher number
-        for word in lstSegmentLIST[i].split(" "):
+        for word in lstMissingNrs: # only decipher words that are needed
             if len(word) == 5: #could 2,3 or 5
                 lettercount  = 0
                 bDone = False
@@ -54,19 +61,17 @@ def solvep2(path):
                         if lettercount == 3: # 3/4 can go into nr5
                             woordenboek[5] = word
                             bDone = True
-                if not bDone:
+                if woordenboek[2] == 0 and not bDone:
                     woordenboek[2] = word # that is all that is left
             elif len(word) == 6: #could 6,9 or 0
                 lettercount = 0
                 bDone = False
                 if woordenboek[6] == 0:
                     for letter in woordenboek[1]: #only nr6 can hold 1 letter of nr1
-                        if word.find(letter) >= 0:
-                            lettercount += 1
+                        if word.find(letter) >= 0:lettercount += 1
                     if lettercount == 1: # only nr 6 cannot hold nr1, so if after the loop the total = 1, its nr6
                         woordenboek[6] = word
                         bDone = True
-                        #break
                 lettercount = 0
                 if woordenboek[9] == 0 and not bDone:
                     for letter in woordenboek[4]: #only nr4 can completly go into nr9
@@ -75,94 +80,48 @@ def solvep2(path):
                         if lettercount == 4: # all 3 letter of seven must go into 3, or it is not 3
                             woordenboek[9] = word
                             bDone = True
-                    #if bDone:
-                        #break
-                if not bDone:
-                    woordenboek[0] = word # that is all that is left
-        if i == 3:
-            dummy = 1
-            None
+                if woordenboek[0] == 0 and not bDone:woordenboek[0] = word # that is all that is left
         #3 construct outcome
         StringConstruct = ""
-        for word in line.split(" "):
-            word = word.replace('\n',"")
-            if len(word) == 2:
-                StringConstruct += "1"
-            elif len(word) == 3:
-                StringConstruct += "7"
-            elif len(word) == 4:
-                StringConstruct += "4"
+        for word in line:
+            if len(word) == 2:StringConstruct += "1"
+            elif len(word) == 3:StringConstruct += "7"
+            elif len(word) == 4:StringConstruct += "4"
             elif len(word) == 5:
-                lettercount = 0
-                bDone = False
-                for letter in woordenboek[2]:
-                    if word.find(letter) >= 0:
-                        lettercount += 1
-                    if lettercount == 5:
-                        StringConstruct += "2"
-                        bDone = True
-                #if bDone:
-                #    break
-                lettercount = 0
-                for letter in woordenboek[3]:
-                    if word.find(letter) >= 0:
-                        lettercount += 1
-                    if lettercount == 5:
-                        StringConstruct += "3"
-                        bDone = True
-                #if bDone:
-                #    break
-                lettercount = 0
-                for letter in woordenboek[5]:
-                    if word.find(letter) >= 0:
-                        lettercount += 1
-                    if lettercount == 5:
-                        StringConstruct += "5"
-                        bDone = True
-                #if bDone:
-                #    break
+                if woordenboek[2] != 0: #if not in woordenboek, then not required to check
+                    lettercount = 0
+                    for letter in woordenboek[2]:
+                        if word.find(letter) >= 0:lettercount += 1
+                        if lettercount == 5:StringConstruct += "2"
+                if woordenboek[3] != 0: #if not in woordenboek, then not required to check
+                    lettercount = 0
+                    for letter in woordenboek[3]:
+                        if word.find(letter) >= 0:lettercount += 1
+                        if lettercount == 5:StringConstruct += "3"
+                if woordenboek[5] != 0: #if not in woordenboek, then not required to check
+                    lettercount = 0
+                    for letter in woordenboek[5]:
+                        if word.find(letter) >= 0:lettercount += 1
+                        if lettercount == 5:StringConstruct += "5"
             elif len(word) == 6:
-                lettercount = 0
-                bDone = False
-                for letter in woordenboek[6]:
-                    if word.find(letter) >= 0:
-                        lettercount += 1
-                    if lettercount == 6:
-                        StringConstruct += "6"
-                        bDone = True
-                #if bDone:
-                #    break
-                lettercount = 0
-                for letter in woordenboek[9]:
-                    if word.find(letter) >= 0:
-                        lettercount += 1
-                    if lettercount == 6:
-                        StringConstruct += "9"
-                        bDone = True
-                #if bDone:
-                 #   break
-                lettercount = 0
-                for letter in woordenboek[0]:
-                    if word.find(letter) >= 0:
-                        lettercount += 1
-                    if lettercount == 6:
-                        StringConstruct += "0"
-                        bDone = True
-                #if bDone:
-                #    break
-            elif len(word) == 7:
-                StringConstruct += "8"
+                if woordenboek[6] != 0: #if not in woordenboek, then not required to check
+                    lettercount = 0
+                    for letter in woordenboek[6]:
+                        if word.find(letter) >= 0:lettercount += 1
+                        if lettercount == 6:StringConstruct += "6"
+                if woordenboek[9] != 0: #if not in woordenboek, then not required to check
+                    lettercount = 0
+                    for letter in woordenboek[9]:
+                        if word.find(letter) >= 0:lettercount += 1
+                        if lettercount == 6:StringConstruct += "9"
+                if woordenboek[0] != 0: #if not in woordenboek, then not required to check
+                    lettercount = 0
+                    for letter in woordenboek[0]:
+                        if word.find(letter) >= 0:lettercount += 1
+                        if lettercount == 6:StringConstruct += "0"
+            elif len(word) == 7:StringConstruct += "8"
         #4 count to total
         easyWordCount += int(StringConstruct)
-        ###### DEBUG #####
-        rev_dict = {}
-        for key, value in woordenboek.items():
-            rev_dict.setdefault(value, set()).add(key)
-      
-        result = [key for key, values in rev_dict.items()
-                              if len(values) > 1]
-        if len(result)>0:
-            print("i:",i,"duplicate values", str(result))
     return easyWordCount
 
 if __name__ == '__main__': # Run when this script is not imported by another script(e.g. Unittest)
