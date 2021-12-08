@@ -20,15 +20,16 @@ def solvep2(path):
     lowestTotalFuel = -1
     for i in range(avg-1,avg+1): #to be sure
         for key,value in grid.items():
-            _X = abs(key - i)
-            _CrabFuel = _X * (_X+1) *0.5 #Crablogic
-            TotalFuel += _CrabFuel * value
+            _X = int(abs(key - i)) # only positive numbers come from this, so bitshifting is allowed
+            _CrabFuel = (_X * (_X+1)) >>1 #Crablogic (fix up2,bitshift instead of fraction to prevent Python from using floats)
+            for j in range(value):
+                TotalFuel += _CrabFuel
         if TotalFuel < lowestTotalFuel or lowestTotalFuel == -1:
-            lowestTotalFuel = TotalFuel      
+            lowestTotalFuel = TotalFuel
         TotalFuel = 0
-    return int(lowestTotalFuel)
+    return lowestTotalFuel
 
 if __name__ == '__main__': # Run when this script is not imported by another script(e.g. Unittest)
     start_time = int(round(time() * 1000))
-    print(solvep2("7/input.txt"))
+    print(solvep2("7/up3.txt"))
     print("### total run time is %s miliseconds" % (int(round(time() * 1000)) - start_time))
