@@ -124,7 +124,7 @@ def solvep2(path,rounds):
         roundsLeft -= 1
         if mustflash == total:
             return rounds - roundsLeft
-    return 0
+    return -1 #Nothing found
 
 if __name__ == '__main__': # Run when this script is not imported by another script(e.g. Unittest)
     start_time = int(round(time() * 1000))
